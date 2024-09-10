@@ -4,11 +4,6 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import tkinter as tk
-from string import whitespace
-
-import row
-from click import command
-
 
 def set_title(row, column):
     global game_over, curr_color
@@ -53,16 +48,16 @@ def check_winner():
             return
 
     #diag check
-    if (board[0][0]["text"] == board[1][1]["text"] == board[2][2]["text"]
-            and board[0][column]["text"] != ""):
+    if ((board[0][0]["text"] == board[1][1]["text"] == board[2][2]["text"])
+            and board[0][0]["text"] != ""):
         label.config(text=board[1][1]["text"] + " is a winner!", foreground=col_green)
         for row in range(3):
             board[row][row].config(foreground=col_green, background=col_orange)
         game_over = True
         return
 
-    if (board[0][2]["text"] == board[1][1]["text"] == board[2][0]["text"]
-        and board[0][column]["text"] != ""):
+    if ((board[0][2]["text"] == board[1][1]["text"] == board[2][0]["text"])
+        and board[0][2]["text"] != ""):
         label.config(text=board[1][1]["text"] + " is a winner!", foreground=col_green)
         for row in range(3):
             board[row][2-row].config(foreground=col_green, background=col_orange)
@@ -87,6 +82,43 @@ def new_game():
         for column in range(3):
             board[row][column].config(text="", background="#ffffff", foreground=curr_color)
 
+def exit_confirmation():
+    def return_to_game():
+        window_exit.destroy()
+
+    def exit_to_mm():
+        window.destroy()
+        window_exit.destroy()
+        import main
+
+    window_exit = tk.Tk()
+    window_exit.title("Exit")
+    window_exit.resizable(False, False)
+    window_exit.update_idletasks()
+    window_width = 350
+    window_height = 180
+    screen_width = window_exit.winfo_screenwidth()
+    screen_height = window_exit.winfo_screenheight()
+    x_cordinate = int((screen_width / 2) - (window_width / 2))
+    y_cordinate = int((screen_height / 2) - (window_height / 2))
+    window_exit.geometry(f"{window_width}x{window_height}+{x_cordinate}+{y_cordinate}")
+
+    frame_exit = tk.Frame(window_exit, background="#f0f0f0")
+    frame_exit.pack(fill="both", padx=10, pady=20, expand=False)
+    label_exit = tk.Label(frame_exit, text="Are you sure you want to quit?", anchor = "center", font=("Liberation Seriff", 14), background="#f0f0f0",
+                 foreground="#343434")
+    frame_exit.grid_columnconfigure(0, weight=1)
+    frame_exit.grid_columnconfigure(1, weight=1)
+    label_exit.grid(row=0, column=0, columnspan=2)
+    but_yes = tk.Button(frame_exit, text="Yes", font=("Liberation Seriff", 16), anchor="center", background="white",
+                   foreground="black", command=exit_to_mm)
+    but_no = tk.Button(frame_exit, text="No", font=("Liberation Seriff", 16), anchor="center", background="white",
+                   foreground="black", command=return_to_game)
+    but_yes.grid(row=1, column=0, padx=5, pady=50)
+    but_no.grid(row=1, column=1, padx=5, pady=50)
+    window_exit.grab_set()
+
+
 playerX = "X"
 playerO = "O"
 curr_player = playerX
@@ -98,6 +130,7 @@ col_red = "#ff0000"
 col_blue = "#0000ff"
 col_orange = "#FF4400"
 col_green = "#00FF00"
+col_gray  = "#C4C3C3"
 curr_color = col_blue
 
 turns = 0
@@ -107,21 +140,24 @@ window.title("Tic-Tac-Toe v1.0")
 window.resizable(False, False)
 
 frame = tk.Frame(window)
+menuButton = tk.Button(frame, text="Return to menu", font=("Consolas", 18), background="white",
+                   foreground="black", command=exit_confirmation)
+menuButton.grid(row=0, column=2, columnspan = 3, sticky="ew")
 label = tk.Label(frame, text=curr_player+"'s turn", font=("Edo SZ", 30), background="#ffffff",
                  foreground="#343434")
 
-label.grid(row=0, column=0, columnspan = 3, sticky="we")
+label.grid(row=1, column=0, columnspan = 3, sticky="we")
 
 for row in range(3):
     for column in range(3):
         board[row][column] = tk.Button(frame, text="", font=("Edo SZ", 50, "bold"),
                                        background="#ffffff", foreground=col_blue, width=6, height=2,
                                        command=lambda row=row, column=column: set_title(row,column))
-        board[row][column].grid(row=row+1, column= column)
+        board[row][column].grid(row=row+2, column= column)
 
-button = tk.Button(frame, text="Restart", font=("Consolas", 30), background=col_orange,
+button = tk.Button(frame, text="Restart", font=("Liberation Seriff", 30), background=col_orange,
                    foreground="white", command=new_game)
-button.grid(row=4, column=0, columnspan = 3, sticky="we")
+button.grid(row=5, column=0, columnspan = 3, sticky="we")
 frame.pack()
 
 window.update()
@@ -134,3 +170,4 @@ window_y = int((screen_height/2)-(window_height/2))
 #format "(w)x(h)+(x)+(y)"
 window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
 window.mainloop()
+
