@@ -4,6 +4,7 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 import tkinter as tk
+import main as mm
 
 def set_title(row, column):
     global game_over, curr_color
@@ -89,7 +90,7 @@ def exit_confirmation():
     def exit_to_mm():
         window.destroy()
         window_exit.destroy()
-        import main
+        mm.start_game()
 
     window_exit = tk.Tk()
     window_exit.title("Exit")
@@ -118,56 +119,58 @@ def exit_confirmation():
     but_no.grid(row=1, column=1, padx=5, pady=50)
     window_exit.grab_set()
 
+def start_pvp():
+    global window, board, label, playerO, playerX, col_red, col_blue, col_orange, col_green, col_gray, curr_color,\
+        diff, turns, game_over, curr_player
+    playerX = "X"
+    playerO = "O"
+    curr_player = playerX
+    board = [[0, 0, 0],
+             [0, 0, 0],
+             [0, 0, 0]]
 
-playerX = "X"
-playerO = "O"
-curr_player = playerX
-board = [[0, 0, 0],
-         [0, 0, 0],
-         [0, 0, 0]]
+    col_red = "#ff0000"
+    col_blue = "#0000ff"
+    col_orange = "#FF4400"
+    col_green = "#00FF00"
+    col_gray  = "#C4C3C3"
+    curr_color = col_blue
 
-col_red = "#ff0000"
-col_blue = "#0000ff"
-col_orange = "#FF4400"
-col_green = "#00FF00"
-col_gray  = "#C4C3C3"
-curr_color = col_blue
+    turns = 0
+    game_over = False
+    window = tk.Tk()
+    window.title("Tic-Tac-Toe v1.0")
+    window.resizable(False, False)
 
-turns = 0
-game_over = False
-window = tk.Tk()
-window.title("Tic-Tac-Toe v1.0")
-window.resizable(False, False)
+    frame = tk.Frame(window)
+    menuButton = tk.Button(frame, text="Return to menu", font=("Consolas", 18), background="white",
+                       foreground="black", command=exit_confirmation)
+    menuButton.grid(row=0, column=2, columnspan = 3, sticky="ew")
+    label = tk.Label(frame, text=curr_player+"'s turn", font=("Edo SZ", 30), background="#ffffff",
+                     foreground="#343434")
 
-frame = tk.Frame(window)
-menuButton = tk.Button(frame, text="Return to menu", font=("Consolas", 18), background="white",
-                   foreground="black", command=exit_confirmation)
-menuButton.grid(row=0, column=2, columnspan = 3, sticky="ew")
-label = tk.Label(frame, text=curr_player+"'s turn", font=("Edo SZ", 30), background="#ffffff",
-                 foreground="#343434")
+    label.grid(row=1, column=0, columnspan = 3, sticky="we")
 
-label.grid(row=1, column=0, columnspan = 3, sticky="we")
+    for rowx in range(3):
+        for columny in range(3):
+            board[rowx][columny] = tk.Button(frame, text="", font=("Edo SZ", 50, "bold"),
+                                           background="#ffffff", foreground=col_blue, width=6, height=2,
+                                           command=lambda row=rowx, column=columny: set_title(row,column))
+            board[rowx][columny].grid(row=rowx+2, column= columny)
 
-for row in range(3):
-    for column in range(3):
-        board[row][column] = tk.Button(frame, text="", font=("Edo SZ", 50, "bold"),
-                                       background="#ffffff", foreground=col_blue, width=6, height=2,
-                                       command=lambda row=row, column=column: set_title(row,column))
-        board[row][column].grid(row=row+2, column= column)
+    button = tk.Button(frame, text="Restart", font=("Liberation Seriff", 30), background=col_orange,
+                       foreground="white", command=new_game)
+    button.grid(row=5, column=0, columnspan = 3, sticky="we")
+    frame.pack()
 
-button = tk.Button(frame, text="Restart", font=("Liberation Seriff", 30), background=col_orange,
-                   foreground="white", command=new_game)
-button.grid(row=5, column=0, columnspan = 3, sticky="we")
-frame.pack()
-
-window.update()
-window_width = window.winfo_width()
-window_height = window.winfo_height()
-screen_width = window.winfo_screenwidth()
-screen_height = window.winfo_screenheight()
-window_x = int((screen_width/2)-(window_width/2))
-window_y = int((screen_height/2)-(window_height/2))
-#format "(w)x(h)+(x)+(y)"
-window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
-window.mainloop()
+    window.update()
+    window_width = window.winfo_width()
+    window_height = window.winfo_height()
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    window_x = int((screen_width/2)-(window_width/2))
+    window_y = int((screen_height/2)-(window_height/2))
+    #format "(w)x(h)+(x)+(y)"
+    window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
+    window.mainloop()
 
