@@ -42,12 +42,16 @@ def select_diff():
         window_dif_sel.destroy()
         launch_pve(1)
 
+    def hard():
+        window_dif_sel.destroy()
+        launch_pve(2)
+
     window_dif_sel = tk.Tk()
     window_dif_sel.title("Select difficulty")
     window_dif_sel.resizable(False, False)
     window_dif_sel.update_idletasks()
     window_width = 350
-    window_height = 220
+    window_height = 270
     screen_width = window_dif_sel.winfo_screenwidth()
     screen_height = window_dif_sel.winfo_screenheight()
     x_cordinate = int((screen_width / 2) - (window_width / 2))
@@ -56,17 +60,20 @@ def select_diff():
 
     frame_exit = tk.Frame(window_dif_sel, background="#f0f0f0")
     frame_exit.pack(fill="both", padx=20, pady=30, expand=False)
-    label_exit = tk.Label(frame_exit, text="Select the difficulty of you opponent", anchor = "center", font=("Liberation Seriff", 14), background="#f0f0f0",
+    label_exit = tk.Label(frame_exit, text="Select the difficulty of your opponent:", anchor = "center", font=("Liberation Seriff", 14), background="#f0f0f0",
                  foreground="#343434")
     frame_exit.grid_columnconfigure(0, weight=1)
     frame_exit.grid_columnconfigure(1, weight=1)
     label_exit.grid(row=0, column=0, columnspan=1)
-    but_yes = tk.Button(frame_exit, text="Easy", font=("Liberation Seriff", 16), anchor="center", background="white",
+    but_easy = tk.Button(frame_exit, text="Easy", font=("Liberation Seriff", 16), anchor="center", background="white",
                    foreground="black", command=easy)
-    but_no = tk.Button(frame_exit, text="Medium", font=("Liberation Seriff", 16), anchor="center", background="white",
+    but_med = tk.Button(frame_exit, text="Medium", font=("Liberation Seriff", 16), anchor="center", background="white",
                    foreground="black", command=medium)
-    but_yes.grid(row=1, column=0, padx=5, pady=10)
-    but_no.grid(row=2, column=0, padx=5, pady=10)
+    but_hard = tk.Button(frame_exit, text="Hard", font=("Liberation Seriff", 16), anchor="center", background="white",
+                       foreground="black", command=medium)
+    but_easy.grid(row=1, column=0, padx=5, pady=10)
+    but_med.grid(row=2, column=0, padx=5, pady=10)
+    but_hard.grid(row=3, column=0, padx=5, pady=10)
     window_dif_sel.grab_set()
 
 start_game()

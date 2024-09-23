@@ -2,34 +2,33 @@ import tkinter as tk
 import main as mm
 import random
 
-prev_game_winner = None  # Track the winner of the previous game
-prev_starting_player = None  # Track who started the previous game
+prev_game_winner = None
+prev_starting_player = None
 
 def set_title(row, column):
-    global game_over, curr_color, playerO, playerX
-    if board[row][column]["text"] != "" or game_over:
+    global game_over, curr_player, curr_color, playerO, playerX, block_controls
+    if board[row][column]["text"] != "" or game_over or block_controls == True:
         return
 
-    global curr_player
     board[row][column]["foreground"] = curr_color
     board[row][column]["text"] = curr_player
 
-
+    block_controls = True
     if curr_player == playerO:
         curr_player = playerX
         curr_color = col_blue
     else:
         curr_player = playerO
         curr_color = col_red
-    label["text"] = curr_player + "'s turn"
     check_winner()
     # ai turn + delay
     if not game_over and curr_player == playerO:
+        label["text"] = curr_player + "'s turn"
         window.after(500, ai_move)
 
 
 def ai_move():
-    global curr_player, game_over, turns, diff, curr_color
+    global curr_player, game_over, turns, diff, curr_color, block_controls
     if diff == 0:
         available_moves = [(r, c) for r in range(3) for c in range(3) if board[r][c]["text"] == ""]
 
@@ -38,14 +37,125 @@ def ai_move():
             row, column = move
             board[row][column]["text"] = curr_player
             board[row][column]["foreground"] = curr_color
+            check_winner()
+            if not game_over:
+                curr_player = playerX
+                curr_color = col_blue
+                label["text"] = curr_player + "'s turn"
+                block_controls = False
 
+
+    elif diff == 1:
+        move = check_potential_win(playerX)
+        if not move:
+            available_moves = [(r, c) for r in range(3) for c in range(3) if board[r][c]["text"] == ""]
+            if available_moves:
+                move = random.choice(available_moves)
+        row, column = move
+        board[row][column]["text"] = curr_player
+        board[row][column]["foreground"] = curr_color
+        check_winner()
+        if not game_over:
             curr_player = playerX
             curr_color = col_blue
             label["text"] = curr_player + "'s turn"
-            check_winner()
+            block_controls = False
 
-    elif diff == 1:
-        print("Oops")
+
+    elif diff == 2:
+        move = best_move()
+        if move:
+            row, column = move
+            board[row][column]["text"] = curr_player
+            board[row][column]["foreground"] = curr_color
+            check_winner()
+            if not game_over:
+                curr_player = playerX
+                curr_color = col_blue
+                label["text"] = curr_player + "'s turn"
+                block_controls = False
+
+
+def check_potential_win(player):
+    for row in range(3):
+        if board[row][0]["text"] == board[row][1]["text"] == player and board[row][2]["text"] == "":
+            return (row, 2)
+        if board[row][0]["text"] == board[row][2]["text"] == player and board[row][1]["text"] == "":
+            return (row, 1)
+        if board[row][1]["text"] == board[row][2]["text"] == player and board[row][0]["text"] == "":
+            return (row, 0)
+
+    for column in range(3):
+        if board[0][column]["text"] == board[1][column]["text"] == player and board[2][column]["text"] == "":
+            return (2, column)
+        if board[0][column]["text"] == board[2][column]["text"] == player and board[1][column]["text"] == "":
+            return (1, column)
+        if board[1][column]["text"] == board[2][column]["text"] == player and board[0][column]["text"] == "":
+            return (0, column)
+
+    # diags
+    if board[0][0]["text"] == board[1][1]["text"] == player and board[2][2]["text"] == "":
+        return (2, 2)
+    if board[0][0]["text"] == board[2][2]["text"] == player and board[1][1]["text"] == "":
+        return (1, 1)
+    if board[1][1]["text"] == board[2][2]["text"] == player and board[0][0]["text"] == "":
+        return (0, 0)
+
+    if board[0][2]["text"] == board[1][1]["text"] == player and board[2][0]["text"] == "":
+        return (2, 0)
+    if board[0][2]["text"] == board[2][0]["text"] == player and board[1][1]["text"] == "":
+        return (1, 1)
+    if board[1][1]["text"] == board[2][0]["text"] == player and board[0][2]["text"] == "":
+        return (0, 2)
+
+    return None
+
+
+# minmax alg
+def minimax(board, depth, is_maximizing):
+    result = get_winner()
+    if result == playerX:
+        return -1
+    elif result == playerO:
+        return 1
+    elif turns == 9 or result == "Tie":
+        return 0
+
+    if is_maximizing:
+        best_score = -float('inf')
+        for row in range(3):
+            for col in range(3):
+                if board[row][col]["text"] == "":
+                    board[row][col]["text"] = playerO
+                    score = minimax(board, depth + 1, False)
+                    board[row][col]["text"] = ""
+                    best_score = max(score, best_score)
+        return best_score
+    else:
+        best_score = float('inf')
+        for row in range(3):
+            for col in range(3):
+                if board[row][col]["text"] == "":
+                    board[row][col]["text"] = playerX
+                    score = minimax(board, depth + 1, True)
+                    board[row][col]["text"] = ""
+                    best_score = min(score, best_score)
+        return best_score
+
+
+def best_move():
+    best_score = -float('inf')
+    move = None
+    for row in range(3):
+        for col in range(3):
+            if board[row][col]["text"] == "":
+                board[row][col]["text"] = playerO
+                score = minimax(board, 0, False)
+                board[row][col]["text"] = ""
+                if score > best_score:
+                    best_score = score
+                    move = (row, col)
+    return move
 
 def check_winner():
     global turns, game_over, prev_game_winner
@@ -95,14 +205,38 @@ def check_winner():
         prev_game_winner = "Tie"  # Track if it's a tie
         return
 
+def get_winner():
+    # hor
+    for row in range(3):
+        if board[row][0]["text"] == board[row][1]["text"] == board[row][2]["text"] and board[row][0]["text"] != "":
+            return board[row][0]["text"]
+
+    # vert
+    for column in range(3):
+        if board[0][column]["text"] == board[1][column]["text"] == board[2][column]["text"] and board[0][column]["text"] != "":
+            return board[0][column]["text"]  # Return the winner ('X' or 'O')
+
+    # diag
+    if board[0][0]["text"] == board[1][1]["text"] == board[2][2]["text"] and board[0][0]["text"] != "":
+        return board[0][0]["text"]  # Return the winner ('X' or 'O')
+
+    if board[0][2]["text"] == board[1][1]["text"] == board[2][0]["text"] and board[0][2]["text"] != "":
+        return board[0][2]["text"]  # Return the winner ('X' or 'O')
+
+    # tie check
+    empty_spaces = [(r, c) for r in range(3) for c in range(3) if board[r][c]["text"] == ""]
+    if not empty_spaces:
+        return "Tie"
+
+    return None
 
 def new_game():
-    global turns, game_over, curr_color, curr_player, prev_starting_player
+    global turns, game_over, curr_color, curr_player, prev_starting_player,block_controls
 
     turns = 0
     game_over = False
+    block_controls = False
 
-    # Decide who goes first based on the previous game's result
     if prev_game_winner == playerO:
         curr_player = playerX
         curr_color = col_blue
@@ -110,13 +244,13 @@ def new_game():
         curr_player = playerO
         curr_color = col_red
     else:
-        curr_player = prev_starting_player  # If it was a tie, the same player starts
+        curr_player = prev_starting_player
         if curr_player == playerX:
             curr_color = col_blue
         else:
             curr_color = col_red
 
-    prev_starting_player = curr_player  # Track who started this round
+    prev_starting_player = curr_player
 
     label.config(text=curr_player + "'s turn", background="#ffffff", foreground="#343434")
 
@@ -165,11 +299,12 @@ def exit_confirmation():
 
 def start_pve(difficulty):
     global window, board, label, playerO, playerX, col_red, col_blue, col_orange, col_green, col_gray, curr_color, \
-        diff, turns, game_over, curr_player, prev_starting_player
-    playerX = "X"  # Human
-    playerO = "O"  # AI
+        diff, turns, game_over, curr_player, prev_starting_player, block_controls
+    playerX = "X"
+    playerO = "O"
+    block_controls = False
     curr_player = playerX
-    prev_starting_player = curr_player  # Initially, playerX starts
+    prev_starting_player = curr_player
     board = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
     col_red = "#ff0000"
