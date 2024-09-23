@@ -70,7 +70,7 @@ def select_diff():
     but_med = tk.Button(frame_exit, text="Medium", font=("Liberation Seriff", 16), anchor="center", background="white",
                    foreground="black", command=medium)
     but_hard = tk.Button(frame_exit, text="Hard", font=("Liberation Seriff", 16), anchor="center", background="white",
-                       foreground="black", command=medium)
+                       foreground="black", command=hard)
     but_easy.grid(row=1, column=0, padx=5, pady=10)
     but_med.grid(row=2, column=0, padx=5, pady=10)
     but_hard.grid(row=3, column=0, padx=5, pady=10)
