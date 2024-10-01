@@ -14,7 +14,7 @@ def start_game():
     y_cordinate = int((screen_height / 2) - (window_height / 2))
     game_mode_window.geometry(f"{window_width}x{window_height}+{x_cordinate}+{y_cordinate}")
 
-    pvp_button = tk.Button(game_mode_window, text="Offline PVP", font=("Consolas", 20), command=lambda: start_game_mode("PVP_OF"))
+    pvp_button = tk.Button(game_mode_window, text="PVP", font=("Consolas", 20), command=lambda: start_game_mode("PVP_OF"))
     pvp_button.pack(pady=20)
 
     pve_button = tk.Button(game_mode_window, text="PVE (Player vs AI)", font=("Consolas", 20), command=lambda: start_game_mode("PVE"))
